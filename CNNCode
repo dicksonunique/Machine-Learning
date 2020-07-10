@@ -1,0 +1,66 @@
+import numpy
+import matplotlib.pyplot as plt
+%matplotlib inline
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense,Activation
+from keras.layers import Dropout
+from keras.layers.convolutional import MaxPooling2D
+from keras.layers import Flatten
+from keras.layers.convolutional import Conv2D
+from keras.utils import np_utils
+from keras import backend as K
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+set_session(tf.Session(config=config))
+import warnings
+warnings.filterwarnings("ignore")
+
+
+print("Machine Learning Expert")
+
+# fix random seed for reproducibility
+K.set_image_dim_ordering('th')
+seed=1234
+numpy.random.seed(seed)
+#reading data
+(traindf,y_train),(testdf,y_test)=mnist.load_data()
+traindf.shape
+testdf[0].shape
+traindf[8]
+plt.imshow(traindf[30],cmap=plt.get_cmap('gray'))
+traindf =traindf.reshape(60000,1,28,28)
+testdf = testdf.reshape(10000,1,28,28)
+traindf=traindf/255
+testdf=testdf/255
+y_train=np_utils.to_categorical(y_train)
+y_test=np_utils.to_categorical(y_test)
+num_classes=y_test.shape[1]
+def model_cnn():
+    model=Sequential()
+    model.add(Conv2D(30,(4,4),input_shape=(1,28,28),activation="relu")) # convolutional layer with 30 features
+    
+    model.add(MaxPooling2D(pool_size=(2,2))) #pooling layer with size 2*2
+    model.add(Conv2D(10,(2,2),activation="relu"))
+    model.add(MaxPooling2D(pool_size=(2,2)))
+   
+    model.add(Dropout(0.3))
+    model.add(Flatten())# converting 2D into !D vector
+    model.add(Dense(128,activation="relu"))
+    model.add(Dense(20,activation="relu"))
+    model.add(Dense(num_classes,activation="softmax"))
+    model.compile(optimizer='adam',metrics=["accuracy"],loss='categorical_crossentropy')
+    return(model)
+    #model accuracy and fitting calculation
+model=model_cnn()
+#fit the model
+model.fit(traindf,y_train,validation_data=(testdf,y_test),epochs=16,batch_size=200,verbose=2)
+#Evalution of the model
+accuracy_scores=model.evaluate(testdf,y_test,verbose=0)
+print(" Error%.2f%%" %(100-accuracy_scores[1]*100))
+
+model.summary()
+model.predict(testdf[:8])
+y_test[:8]
