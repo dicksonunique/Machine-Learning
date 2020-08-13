@@ -1,0 +1,30 @@
+
+@author: Dickson
+"""
+import os
+from PIL import Image
+def resizeImage(imageResizePath,path1,row,col,path2):
+    for file in imageResizePath:
+      openImage=Image.open(path1+"\\"+file)
+   # display(im)
+      img=openImage.resize((row,col))  
+     #converting image to gray
+      gray=img.convert("L")
+      gray.save(path2+"\\"+file,"png")
+     
+        
+#Function implementation     
+
+#dir is the path that conatins the image to be resizes
+#dirs is the path to the folder you want to save the just resized images
+# image resized to 300 by 300
+
+dirs=r"C:\Users\Dickson\Documents\Python\png_uwem"
+paths1=r"C:\Users\Dickson\Documents\Python\png_images"
+ImageToResize=os.listdir(paths1)
+column_size=300
+row_size=300
+
+
+#calling the resize method
+resizeImage(ImageToResize, paths1,row_size,column_size, dirs)
